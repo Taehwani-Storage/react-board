@@ -12,8 +12,14 @@ function ShowOne() {
     let [updateContent, setUpdateContent] = useState("")
     let navigate = useNavigate()
 
+    let token = sessionStorage.getItem("token")
+
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/board/showOne/${id}`)
+        axios.get(`http://localhost:8080/api/board/showOne/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then((resp) => {
                 let {data} = resp
                 if (data.result === 'success') {

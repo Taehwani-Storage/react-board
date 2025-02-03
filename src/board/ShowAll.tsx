@@ -2,7 +2,7 @@ import React, {useEffect, useReducer} from 'react';
 import {useParams} from "react-router";
 import axios from "axios";
 import {reducer} from "../reducers/BoardReducer.tsx";
-import {Pagination, Card, Container, Row, Col, Table} from "react-bootstrap";
+import {Pagination, Container, Row, Col, Table} from "react-bootstrap";
 import Banner from "./Banner.tsx";
 import SortBar from "./SortBar.tsx";
 
@@ -17,14 +17,21 @@ let initialState = {
 function ShowAll() {
     let [state, dispatch] = useReducer(reducer, initialState);
     let {pageNo} = useParams();
+    // let temp: PageInfo;
+    let token = sessionStorage.getItem('token')
+    console.log(token)
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/board/showAll/${pageNo}`)
+        axios.get(`http://localhost:8080/api/board/showAll/${pageNo}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then((resp) => {
                 let {data} = resp;
                 if (data.result === 'success') {
                     dispatch({
-                        type: 'ON_SHOWALL_LOAD',
+                        type: 'ON_SHOW_ALL_LOAD',
                         temp: {
                             list: data.list,
                             startPage: data.startPage,
@@ -34,13 +41,30 @@ function ShowAll() {
                         }
                     });
                 }
-            });
+            })
+            .catch(error => console.error("데이터 로딩 실패:", error));
     }, [pageNo]);
 
-    const handleSortChange = (category) => {
-        alert(`정렬 기준 변경: ${category}`);
-        // 정렬 로직 추가
-    };
+    const handleSortChange = (category) =>  {
+        const sortedList = [...state.list];
+        switch (category) {
+            case "작성일":
+                sortedList.sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
+                break;
+            case "제목":
+                sortedList.sort((a, b) => a.title.localeCompare(b.title));
+                break;
+            case "작성자":
+                sortedList.sort((a, b) => a.nickname.localeCompare(b.nickname));
+                break;
+            default:
+                break;
+        }
+        dispatch({
+            type: 'ON_SHOW_ALL_LOAD',
+            temp: { ...state, list: sortedList }
+        });
+    }
 
     return (
         <div>

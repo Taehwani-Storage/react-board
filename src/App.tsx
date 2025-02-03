@@ -7,6 +7,7 @@ import React from "react";
 import Register from "./user/Register.tsx";
 import ShowAll from "./board/ShowAll.tsx";
 import ShowOne from "./board/ShowOne.tsx";
+import Write from "./board/Write.tsx";
 
 /* Typescript 기초형식
 interface User {
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/user/Register" element={<Register />}/>
                 <Route path="/board/showAll/:pageNo" element={<ShowAll />}/>
                 <Route path="/board/showOne/:id" element={<ShowOne />}/>
+                <Route path="/board/write" element={<Write />}/>
             </Routes>
         </BrowserRouter>
     )

@@ -1,7 +1,7 @@
 export function reducer(state, action) {
 
     switch (action.type) {
-        case 'ON_SHOWALL_LOAD':
+        case 'ON_SHOW_ALL_LOAD':
             return ({
                 list: action.temp.list,
                 startPage: action.temp.startPage,
@@ -19,8 +19,13 @@ export function reducer(state, action) {
                 entryDate: action.item.entryDate,
                 modifyDate: action.item.modifyDate,
                 formattedEntryDate: action.item.formattedEntryDate,
-                formattedModifyDdate: action.item.formattedModifyDdate
+                formattedModifyDate: action.item.formattedModifyDate
             })
+        case 'ON_CHANGE':
+            return {
+                ...state,
+                inputs: {...state.inputs, [action.name]: action.value}
+            }
         default:
             return state
     }

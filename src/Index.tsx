@@ -35,6 +35,7 @@ function Index() {
                 // 어트리뷰트로 처리하는 것이 나닌 지금과 같은 .then이라는 함수를 통해 실행.
                 let {data} = resp;
                 if (data.result === 'success') {
+                    sessionStorage.setItem('token', data.token)
                     location.href = '/board/showAll/1';
                 } else {
                     Swal.fire({
