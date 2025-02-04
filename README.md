@@ -1,67 +1,89 @@
-# 📝 리액트 게시판 미니 프로젝트 (프론트엔드 - TypeScript)
+다음은 업로드한 디렉토리 구조를 반영하여 **React(TypeScript) 게시판 미니 프로젝트**의 설명을 작성한 내용입니다. **Java Learning Guide** 스타일을 참고하여 구성했습니다.  
 
-이 프로젝트는 **React (TypeScript)** 를 활용하여 백엔드(Spring)에서 구현된 게시판의 프론트엔드를 담당합니다.  
-사용자는 **게시글 목록 조회, 게시글 작성, 수정, 삭제, 댓글 기능**을 웹 UI를 통해 사용할 수 있습니다.  
+---
 
-## 📌 프로젝트 환경
-- **프레임워크**: React (TypeScript 기반, `.tsx` 확장자 사용)
-- **상태관리**: React Hooks (useState, useEffect)
-- **라우팅**: React Router
-- **스타일링**: Tailwind CSS
-- **API 통신**: Axios (RESTful API)
-- **아이콘**: Lucide-react
-- **타입 정의**: TypeScript 인터페이스 활용
+# 📌 React(TypeScript) 게시판 미니 프로젝트 가이드
 
-## 📂 프로젝트 폴더 구조
+## 1️⃣ 개요  
+이 프로젝트는 **React + TypeScript**를 사용하여 간단한 게시판을 구현한 프론트엔드 애플리케이션입니다.  
+게시글 목록 조회, 상세 보기, 글 작성 및 댓글 기능을 포함하고 있으며, Redux를 활용한 상태 관리를 적용했습니다.
+
+---
+
+## 2️⃣ 프로젝트 환경  
+✅ **프레임워크**: React + Vite + TypeScript  
+✅ **상태관리**: Redux (Reducer 활용)  
+✅ **라우팅**: React Router  
+✅ **API 통신**: Axios (RESTful API)  
+✅ **스타일링**: CSS 적용  
+
+---
+
+## 3️⃣ 폴더 구조  
+📂 프로젝트 폴더 구조는 다음과 같습니다.
+
 ```
-/src
- ├── components  # UI 컴포넌트 폴더
- │   ├── PostList.tsx  # 게시글 목록
- │   ├── PostDetail.tsx  # 게시글 상세 보기
- │   ├── PostForm.tsx  # 게시글 작성/수정 폼
- │   ├── CommentList.tsx  # 댓글 목록
- │   └── CommentForm.tsx  # 댓글 작성 폼
- ├── pages
- │   ├── Home.tsx  # 메인 페이지
- │   ├── PostPage.tsx  # 게시글 페이지
- │   ├── EditPostPage.tsx  # 게시글 수정 페이지
- │   └── NotFound.tsx  # 404 페이지
- ├── api
- │   ├── postApi.ts  # 게시판 관련 API 요청
- │   └── commentApi.ts  # 댓글 관련 API 요청
- ├── types
- │   ├── post.ts  # 게시글 타입 정의
- │   ├── comment.ts  # 댓글 타입 정의
- ├── App.tsx  # 메인 컴포넌트
- ├── index.tsx  # 진입점
- └── styles.css  # 스타일링
+src
+ ├── assets
+ │   └── react.svg             # React 로고 이미지
+ │
+ ├── board                     # 게시판 관련 컴포넌트
+ │   ├── Banner.tsx            # 배너 UI 컴포넌트
+ │   ├── ReplySection.tsx      # 댓글 섹션
+ │   ├── ShowAll.tsx           # 게시글 목록 조회
+ │   ├── ShowOne.tsx           # 게시글 상세 보기
+ │   ├── SortBar.tsx           # 정렬 바 UI
+ │   ├── Write.tsx             # 게시글 작성 폼
+ │
+ ├── reducers                  # Redux Reducer 폴더
+ │   ├── BoardReducer.tsx      # 게시판 상태 관리
+ │   ├── UserReducer.tsx       # 사용자 상태 관리
+ │
+ ├── user                      # 사용자 관련 컴포넌트
+ │   ├── Register.tsx          # 회원가입 컴포넌트
+ │
+ ├── App.css                   # 전역 스타일
+ ├── App.tsx                   # 메인 앱 컴포넌트
+ ├── Index.tsx                 # React 엔트리 포인트
+ ├── index.css                 # 글로벌 스타일 파일
+ ├── main.tsx                  # Vite 엔트리 포인트
+ ├── vite-env.d.ts             # Vite 타입 설정
+ ├── README.md                 # 프로젝트 설명 파일
 ```
 
-## 📌 게시글 목록 보기 (PostList.tsx)
+---
+
+## 4️⃣ 주요 기능  
+
+### 📜 4.1 게시글 목록 조회 (ShowAll.tsx)  
+게시글 목록을 API에서 불러와 화면에 출력합니다.
+
 ```tsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Post } from "../types/post";
 
-const PostList = () => {
+interface Post {
+  id: number;
+  title: string;
+}
+
+const ShowAll = () => {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    axios.get<Post[]>("/api/posts")
+    axios.get("/api/posts")
       .then(response => setPosts(response.data))
       .catch(error => console.error("게시글을 불러오는 중 오류 발생:", error));
   }, []);
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold mb-4">📜 게시글 목록</h1>
+    <div>
+      <h1>📜 게시글 목록</h1>
       <ul>
         {posts.map(post => (
-          <li key={post.id} className="border p-4 my-2">
-            <Link to={`/posts/${post.id}`} className="text-xl text-blue-500">
-              {post.title}
-            </Link>
+          <li key={post.id}>
+            <Link to={`/posts/${post.id}`}>{post.title}</Link>
           </li>
         ))}
       </ul>
@@ -69,35 +91,28 @@ const PostList = () => {
   );
 };
 
-export default PostList;
+export default ShowAll;
 ```
 
-## 🖊️ 게시글 작성 및 수정 (PostForm.tsx)
+---
+
+### 📝 4.2 게시글 작성 (Write.tsx)  
+새로운 게시글을 작성하고 저장할 수 있습니다.
+
 ```tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Post } from "../types/post";
 
-type PostFormProps = {
-  post?: Post;
-};
-
-const PostForm: React.FC<PostFormProps> = ({ post }) => {
-  const [title, setTitle] = useState(post?.title || "");
-  const [content, setContent] = useState(post?.content || "");
+const Write = () => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const postData = { title, content };
-
     try {
-      if (post) {
-        await axios.put(`/api/posts/${post.id}`, postData);
-      } else {
-        await axios.post("/api/posts", postData);
-      }
+      await axios.post("/api/posts", { title, content });
       navigate("/");
     } catch (error) {
       console.error("게시글 저장 중 오류 발생:", error);
@@ -105,63 +120,133 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
   };
 
   return (
-    <div className="container mx-auto">
-      <h2 className="text-xl font-bold">{post ? "✏️ 게시글 수정" : "📝 새 게시글 작성"}</h2>
+    <div>
+      <h2>📝 새 게시글 작성</h2>
       <form onSubmit={handleSubmit}>
-        <input 
-          type="text"
-          placeholder="제목을 입력하세요"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border p-2 my-2"
-        />
-        <textarea
-          placeholder="내용을 입력하세요"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full border p-2 my-2"
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2">
-          {post ? "수정 완료" : "작성 완료"}
-        </button>
+        <input type="text" placeholder="제목" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <textarea placeholder="내용" value={content} onChange={(e) => setContent(e.target.value)} />
+        <button type="submit">작성 완료</button>
       </form>
     </div>
   );
 };
 
-export default PostForm;
+export default Write;
 ```
 
-## 🗑️ 게시글 삭제 기능
+---
+
+### 🔍 4.3 게시글 상세 보기 (ShowOne.tsx)  
+게시글 상세 정보를 API에서 가져와 출력합니다.
+
 ```tsx
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
-const deletePost = async (postId: number) => {
-  if (window.confirm("정말 삭제하시겠습니까?")) {
-    try {
-      await axios.delete(`/api/posts/${postId}`);
-      alert("삭제되었습니다.");
-      window.location.reload();
-    } catch (error) {
-      console.error("삭제 중 오류 발생:", error);
-    }
-  }
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+}
+
+const ShowOne = () => {
+  const { id } = useParams<{ id: string }>();
+  const [post, setPost] = useState<Post | null>(null);
+
+  useEffect(() => {
+    axios.get(`/api/posts/${id}`)
+      .then(response => setPost(response.data))
+      .catch(error => console.error("게시글 불러오기 실패:", error));
+  }, [id]);
+
+  if (!post) return <p>게시글을 불러오는 중...</p>;
+
+  return (
+    <div>
+      <h1>{post.title}</h1>
+      <p>{post.content}</p>
+    </div>
+  );
 };
+
+export default ShowOne;
 ```
 
-## 🌐 RESTful API 연동
-```ts
+---
+
+### 💬 4.4 댓글 기능 (ReplySection.tsx)  
+댓글을 조회하고 화면에 표시합니다.
+
+```tsx
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Post } from "../types/post";
 
-export const getPosts = () => axios.get<Post[]>("/api/posts");
-export const getPostById = (id: number) => axios.get<Post>(`/api/posts/${id}`);
-export const createPost = (data: Post) => axios.post("/api/posts", data);
-export const updatePost = (id: number, data: Post) => axios.put(`/api/posts/${id}`, data);
-export const deletePost = (id: number) => axios.delete(`/api/posts/${id}`);
+interface Comment {
+  id: number;
+  text: string;
+  author: string;
+}
+
+const ReplySection = ({ postId }: { postId: number }) => {
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  useEffect(() => {
+    axios.get(`/api/posts/${postId}/comments`)
+      .then(response => setComments(response.data))
+      .catch(error => console.error("댓글 불러오기 실패:", error));
+  }, [postId]);
+
+  return (
+    <div>
+      <h3>💬 댓글</h3>
+      <ul>
+        {comments.map(comment => (
+          <li key={comment.id}>
+            {comment.text} - {comment.author}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ReplySection;
 ```
 
-## 🚀 결론
-이 게시판 프론트엔드 프로젝트는 **React (TypeScript), Axios, Tailwind CSS**를 활용하여 직관적이고 간결한 UI를 제공합니다.  
-RESTful API를 통해 백엔드와 연동되며, 게시글 및 댓글 CRUD 기능을 포함하고 있습니다.  
-🔥 더욱 완성도 높은 프로젝트를 위해 발전시켜 보세요! 🎉
+---
+
+## 5️⃣ Redux 상태 관리 (reducers/BoardReducer.tsx)
+게시판 관련 전역 상태를 관리합니다.
+
+```tsx
+import { createSlice } from "@reduxjs/toolkit";
+
+interface BoardState {
+  posts: { id: number; title: string; content: string }[];
+}
+
+const initialState: BoardState = {
+  posts: [],
+};
+
+const boardSlice = createSlice({
+  name: "board",
+  initialState,
+  reducers: {
+    setPosts: (state, action) => {
+      state.posts = action.payload;
+    },
+  },
+});
+
+export const { setPosts } = boardSlice.actions;
+export default boardSlice.reducer;
+```
+
+---
+
+## 🚀 결론  
+이 프로젝트는 **React + TypeScript + Redux**를 활용하여 게시판을 구현한 프론트엔드 애플리케이션입니다.  
+추가적으로 **페이징 처리, 좋아요 기능, 사용자 인증** 등을 확장하여 발전시킬 수 있습니다.  
+🔥 완성도를 높이며 성장하는 개발자가 되어 보세요! 🎉  
